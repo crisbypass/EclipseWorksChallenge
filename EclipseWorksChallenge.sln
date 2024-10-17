@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EclipseWorksChallenge", "EclipseWorksChallenge\EclipseWorksChallenge.csproj", "{8A134249-1B07-4EC5-91CA-36D6A8FE4A6C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A134249-1B07-4EC5-91CA-36D6A8FE4A6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A134249-1B07-4EC5-91CA-36D6A8FE4A6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A134249-1B07-4EC5-91CA-36D6A8FE4A6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A134249-1B07-4EC5-91CA-36D6A8FE4A6C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DAE85133-41FA-4069-BF96-1616A86AF4B1}
+	EndGlobalSection
+EndGlobal

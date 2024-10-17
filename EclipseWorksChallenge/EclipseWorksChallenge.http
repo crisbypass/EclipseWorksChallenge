@@ -1,0 +1,6 @@
+@EclipseWorksChallenge_HostAddress = http://localhost:5181
+
+GET {{EclipseWorksChallenge_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
