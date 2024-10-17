@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EclipseWorksChallenge", "EclipseWorksChallenge\EclipseWorksChallenge.csproj", "{8A134249-1B07-4EC5-91CA-36D6A8FE4A6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTests", "MyTests\MyTests.csproj", "{0FAB074E-9B69-416B-A8A2-65EE4567A399}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{8A134249-1B07-4EC5-91CA-36D6A8FE4A6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A134249-1B07-4EC5-91CA-36D6A8FE4A6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A134249-1B07-4EC5-91CA-36D6A8FE4A6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FAB074E-9B69-416B-A8A2-65EE4567A399}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FAB074E-9B69-416B-A8A2-65EE4567A399}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FAB074E-9B69-416B-A8A2-65EE4567A399}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FAB074E-9B69-416B-A8A2-65EE4567A399}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
