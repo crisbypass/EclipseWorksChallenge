@@ -1,6 +1,6 @@
-@EclipseWorksChallenge_HostAddress = http://localhost:5181
+@EclipseWorksChallenge_HostAddress = https://localhost:55186/api
 
-GET {{EclipseWorksChallenge_HostAddress}}/weatherforecast/
-Accept: application/json
+# GET {{EclipseWorksChallenge_HostAddress}}/Seguranca/RecuperarJwkJson
+# Accept: application/json
 
-###
+# ###

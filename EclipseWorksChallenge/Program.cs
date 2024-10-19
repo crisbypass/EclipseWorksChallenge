@@ -1,13 +1,14 @@
+using EclipseWorksChallenge.MyData;
+using EclipseWorksChallenge.MySecurity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-//builder.Services.AddDbContext<MyMvc.Identity_Data.ApplicationDbContext>(options =>
-//    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<MyDbContext>();
 
 //builder.Services
 //.AddControllers()
@@ -17,14 +18,30 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 //    options.SuppressModelStateInvalidFilter = true;
 //});
 
-var tokenKey = "MyUltraUnbelievableSecretKey@#$10";
-var key = Encoding.ASCII.GetBytes(tokenKey);
+builder.Services.AddSingleton<IMyJwtSigningManager, MyJwtSigningManager>();
 
-//builder.Services.AddAuthentication(x =>
-//{
-//    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer();
+
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IMyJwtSigningManager>((options, signingManager) =>
+    {
+        options.TokenValidationParameters =
+        new TokenValidationParameters
+        {
+            ValidIssuer = "Me",
+            ValidAudience = "Me",
+            ClockSkew = TimeSpan.Zero,
+            IssuerSigningKey = signingManager.FetchCurrentEcdsaKey()
+        };
+    });
+
+//var tokenKey = "MyUltraUnbelievableSecretKey@#$10";
+//var key = Encoding.ASCII.GetBytes(tokenKey);
 //.AddJwtBearer(x =>
 //{
 //    x.RequireHttpsMetadata = false;
@@ -35,22 +52,6 @@ var key = Encoding.ASCII.GetBytes(tokenKey);
 //        IssuerSigningKey = new SymmetricSecurityKey(key),
 //        ValidateIssuer = false,
 //        ValidateAudience = false
-//    };
-//    x.Events = new JwtBearerEvents
-//    {
-//        OnMessageReceived = context =>
-//        {
-//            var accessToken = context.Request.Query["access_token"];
-//            // If the request is for our hub(to SignalR, in fact)...
-//            var path = context.HttpContext.Request.Path;
-//            if (!string.IsNullOrEmpty(accessToken) &&
-//                path.StartsWithSegments("/MySignalR/MyHub"))
-//            {
-//                // Read the token out of the query string
-//                context.Token = accessToken;
-//            }
-//            return Task.CompletedTask;
-//        }
 //    };
 //});
 
@@ -68,38 +69,37 @@ var key = Encoding.ASCII.GetBytes(tokenKey);
 
 //});
 
-//builder.Services.AddSwaggerGen(options =>
-//{
-//    options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme,
-//        new OpenApiSecurityScheme
-//        {
-//            Description = "Please, provide token value.",
-//            In = ParameterLocation.Header,
-//            Name = "Authorization",
-//            Type = SecuritySchemeType.Http,
-//            BearerFormat = "JWT",
-//            Scheme = "bearer"
-//        });
-
-//    options.AddSecurityRequirement(new OpenApiSecurityRequirement() {
-//        {
-//            new OpenApiSecurityScheme
-//            {
-//                Reference = new OpenApiReference
-//                {
-//                    Type = ReferenceType.SecurityScheme,
-//                    Id = "Bearer"
-//                }
-//            },
-//            Array.Empty<string>()
-//        }
-//    });
-//});
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme,
+        new OpenApiSecurityScheme
+        {
+            Description = "Por favor, forneça um token válido.",
+            In = ParameterLocation.Header,
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "bearer"
+        });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+});
 
 var app = builder.Build();
 
@@ -110,19 +110,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 //app.UseHttpsRedirection();
-
 //app.UseRouting();
-
 //app.UseCors();
-
 //app.UseAuthentication();
-
 //app.UseAuthorization();
 
-
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
