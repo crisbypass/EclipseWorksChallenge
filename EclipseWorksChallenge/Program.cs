@@ -1,4 +1,6 @@
 using EclipseWorksChallenge.MyData;
+using EclipseWorksChallenge.MyData.MyEntities;
+using EclipseWorksChallenge.MyData.MyRepositories;
 using EclipseWorksChallenge.MySecurity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -20,6 +22,10 @@ builder.Services.AddDbContext<MyDbContext>();
 
 builder.Services.AddSingleton<IMyJwtSigningManager, MyJwtSigningManager>();
 
+builder.Services.AddScoped<IGenericRepository<Projeto>, GenericRepository<Projeto>>();
+builder.Services.AddScoped<IGenericRepository<Tarefa>, GenericRepository<Tarefa>>();
+builder.Services.AddScoped<IGenericRepository<Historico>, GenericRepository<Historico>>();
+builder.Services.AddScoped<IGenericRepository<Comentario>, GenericRepository<Comentario>>();
 
 builder.Services.AddAuthentication(x =>
 {
@@ -98,7 +104,6 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-
 });
 
 var app = builder.Build();

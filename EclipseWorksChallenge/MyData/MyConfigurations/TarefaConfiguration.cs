@@ -15,6 +15,11 @@ namespace EclipseWorksChallenge.MyData.MyConfigurations
              .HasForeignKey(p => p.TarefaId)
              .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasMany(t => t.Comentarios)
+             .WithOne(p => p.Tarefa)
+             .HasForeignKey(p => p.TarefaId)
+             .OnDelete(DeleteBehavior.NoAction);
+
             builder.Property(p => p.Prioridade)
             .HasConversion(v => v.ToString(), v => (Prioridade)Enum.Parse(typeof(Prioridade), v));
             builder.Property(p => p.Status)

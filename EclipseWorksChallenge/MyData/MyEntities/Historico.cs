@@ -1,9 +1,12 @@
 ﻿namespace EclipseWorksChallenge.MyData.MyEntities
 {
-    public class Historico
+    public class Historico : Entity
     {
-        public int Id { get; set; }
         public int TarefaId { get; set; }
+        /// <summary>
+        /// Descrição dos eventos efetuados no momento específico.
+        /// </summary>
+        public string Resumo { get; set; } = default!;
         /// <summary>
         /// Usuario mais recente a efetuar edições.
         /// </summary>

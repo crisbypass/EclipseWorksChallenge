@@ -9,14 +9,16 @@
     /// Caso o usuário tente remover um projeto com tarefas pendentes, a API deve retornar
     /// um erro e sugerir a conclusão ou remoção das tarefas primeiro.
     /// </remarks>
-    public class Projeto
+    public class Projeto : Entity
     {
-        public int Id { get; set; }
         public string NomeUsuario { get; set; } = default!;
         /// <summary>
         /// Cada projeto tem um limite máximo de 20 tarefas. 
-        /// Tentar adicionar mais tarefas do que o limite deve resultar em um erro.
+        /// Tentar adicionar mais tarefas do que o limite deveria resultar em um erro.
         /// </summary>
+        /// <remarks>
+        /// Vamos adicionar uma mensagem de validação para esse modelo.
+        /// </remarks>
         public ICollection<Tarefa> Tarefas { get; set; } = [];
     }
 }

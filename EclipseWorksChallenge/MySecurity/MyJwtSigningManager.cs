@@ -6,6 +6,22 @@ using System.Security.Cryptography;
 
 namespace EclipseWorksChallenge.MySecurity
 {
+    /// <summary>
+    /// Serviço requerido para podermos trabalhar com a simulação de identidades de usuário e suas funções.
+    /// </summary>
+    /// <remarks>
+    /// Foi inevitável o uso desse serviço, pois tornou o processo de desenvolvimento mais adequado
+    /// para as necessidades do desafio, mesmo que a autenticação e a autorização não fossem mandatórios.
+    /// De outra forma, o desenvolvimento se tornaria mais complexo e fora das recomendações.
+    /// Para um projeto baseado em WebApi(RESTful), para possibilitar ao menos a simulação de um
+    /// usuário, precisaríamos recuperar os dados desse usuário de alguma forma. A identificação baseada
+    /// em cookies(AspNetCoreIdentity) é recomendada apenas em casos aonde temos a possibilidade de 
+    /// persistência da identidade em cookies, como um projeto SPA, MVC(ou outro Front-End). 
+    /// E não é recomendada para WebApi's. Sendo assim, iremos usar um padrão comum e recomendado,
+    /// recuperando as informações do usuário através de tokens, como o do tipo JWT.
+    /// O padrão de criptografia elíptica(Ecdsa) de tokens é recomendado e eu o adotei para este serviço,
+    /// mas obviamente poderia ser baseado em outro(como o RSA).
+    /// </remarks>
     public class MyJwtSigningManager : IMyJwtSigningManager
     {
         private readonly JsonWebKey _currentJwk;
@@ -46,8 +62,8 @@ namespace EclipseWorksChallenge.MySecurity
             return token;
         }
         public SecurityKey FetchCurrentEcdsaKey() => _currentEcdsaKey;
-        public string CreateJwkJson() => CreateJwkCore_(NamedCurves.nistP256);
-        private static string CreateJwkCore_(ECCurve namedCurve)
+        public string CreateJwkJson() => CreateJwkCoreJson(NamedCurves.nistP256);
+        private static string CreateJwkCoreJson(ECCurve namedCurve)
         {
             using var privateEcdsa = ECDsa.Create(namedCurve);
             var keyId = Guid.NewGuid().ToString();
