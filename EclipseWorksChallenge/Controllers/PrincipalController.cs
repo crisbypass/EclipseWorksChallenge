@@ -1,5 +1,4 @@
-﻿using EclipseWorksChallenge.MyData.MyEntities;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 namespace EclipseWorksChallenge.Controllers
 {
     [Route("api/[controller]")]
@@ -26,7 +25,7 @@ namespace EclipseWorksChallenge.Controllers
         //Atualização de Tarefas - atualizar o status ou detalhes de uma tarefa
         //Remoção de Tarefas - remover uma tarefa de um projeto
 
-        [HttpGet]
+        [HttpGet($"{nameof(ListarProjetos)}")]
         public async Task<IActionResult> ListarProjetos()
         {
             if (!ModelState.IsValid)
@@ -36,7 +35,7 @@ namespace EclipseWorksChallenge.Controllers
 
             return Ok(); //lista de projetoDto
         }
-        [HttpGet]
+        [HttpGet($"{nameof(ListarTarefas)}")]
         public async Task<IActionResult> ListarTarefas()
         {
             if (!ModelState.IsValid)
@@ -46,7 +45,7 @@ namespace EclipseWorksChallenge.Controllers
 
             return Ok(); //lista de tarefaDto
         }
-        [HttpPost]
+        [HttpPost($"{nameof(CriarProjeto)}")]
         public async Task<IActionResult> CriarProjeto()
         {
             if (!ModelState.IsValid)
@@ -54,7 +53,7 @@ namespace EclipseWorksChallenge.Controllers
                 return BadRequest(ModelState);
             }
 
-            return CreatedAtAction(nameof(CriarProjeto), new { }); //projetoDto
+            return CreatedAtAction(nameof(CriarProjeto), new { Status = "" }); //projetoDto
         }
         // Ao menos na descrição do desafio, não é mencionado algo sobre a possibilidade de edição de projetos.
         //[HttpPut($"{nameof(EditarProjeto)}/{{id}}")]
@@ -80,28 +79,28 @@ namespace EclipseWorksChallenge.Controllers
                 return NotFound();
             }
 
-            return Ok(new { }); //tarefaDto
+            return Ok(new { Status = "" }); //tarefaDto
         }
 
-        [HttpPost("")] //Precisamos do identificador do projeto.
-        public async Task<IActionResult> CriarTarefa()
+        [HttpPost($"{nameof(CriarTarefa)}/{{projectId}}")] //Precisamos do identificador do projeto.
+        public async Task<IActionResult> CriarTarefa(int projectId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            return CreatedAtAction(nameof(CriarTarefa), new { }); //tarefaDto
+            return CreatedAtAction(nameof(CriarTarefa), new { Status = "" }); //tarefaDto
         }
 
         [HttpPut($"{nameof(EditarTarefa)}/{{id}}")]
-        public async Task<IActionResult> EditarTarefa()
+        public async Task<IActionResult> EditarTarefa(int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(new { }); //tarefaDto
+            return Ok(new { Status = "" }); //tarefaDto
         }
 
         [HttpDelete($"{nameof(ExcluirTarefa)}/{{id}}")] //Precisamos do identificador do projeto.
@@ -117,7 +116,7 @@ namespace EclipseWorksChallenge.Controllers
                 return NotFound();
             }
 
-            return Ok(new { }); //tarefaDto
+            return Ok(new { Status ="" }); //tarefaDto
         }
     }
 }

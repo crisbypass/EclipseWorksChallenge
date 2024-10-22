@@ -1,7 +1,10 @@
-﻿using EclipseWorksChallenge.MyModels;
-using EclipseWorksChallenge.MySecurity;
+﻿using Application.Interfaces;
+using EclipseWorksChallenge.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Net.Mime;
 using System.Security.Claims;
 
 namespace EclipseWorksChallenge.Controllers
@@ -29,18 +32,25 @@ namespace EclipseWorksChallenge.Controllers
         /// <remarks>
         /// Não há necessidade de informar códigos de acesso(ou senhas).
         /// </remarks>
+        
         [HttpPost(nameof(RecuperarToken))]
+        [ProducesResponseType<BadRequest>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
+        [ProducesResponseType<Ok>(StatusCodes.Status200OK, MediaTypeNames.Text.Plain)]
+        [SwaggerOperation("Recupera um JWT, para uso em um endpoint protegido.",
+            @"Fornece a opção de obter um JWT, para experimentos. Não é necessário
+            um código de acesso. Informe apenas um nome de usuário e sua função, para
+            serem usados na identidade e incorporados no conteúdo do token.")]
         public async Task<IActionResult> RecuperarToken(UsuarioModel usuarioModel)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            
+
             return await Task.FromResult(Ok(
-                _myJwtSigningManager.FetchToken(
-                    usuarioModel.Nome,
-                    Enum.GetName(usuarioModel.Funcao)!)));
+                _myJwtSigningManager.FetchToken(usuarioModel.Nome,
+                Enum.GetName(usuarioModel.Funcao)!)
+                ));
         }
         /// <summary>
         /// Confira os dados do usuário que estão contidos no Token. 
@@ -49,6 +59,11 @@ namespace EclipseWorksChallenge.Controllers
         /// Nome do usuário e sua função.
         /// </returns>
         [Authorize]
+        [ProducesResponseType<UnauthorizedResult>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<Ok>(StatusCodes.Status200OK, MediaTypeNames.Text.Plain)]
+        [SwaggerOperation("Verifica os dados do usuário que estão contidos no JWT.",
+            @"Fornece a opção de verificar o nome e a função do usuário contidos no JWT.
+            Forneça um token na aba para segurança(icone do cadeado), a partir de 'RecuperarToken'.")]
         [HttpGet(nameof(VerificarInfoUsuario))]
         public async Task<IActionResult> VerificarInfoUsuario()
         {

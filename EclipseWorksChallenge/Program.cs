@@ -1,64 +1,19 @@
-using EclipseWorksChallenge.MyData;
-using EclipseWorksChallenge.MyData.MyEntities;
-using EclipseWorksChallenge.MyData.MyRepositories;
-using EclipseWorksChallenge.MySecurity;
+using Infrastructure.IoC.IocExtensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddDbContext<MyDbContext>();
+builder.Services.ConfigureCoreServices();
+builder.Services.ConfigureApiServices();
 
-//builder.Services
 //.AddControllers()
 //.ConfigureApiBehaviorOptions(options =>
 //{
 //    options.SuppressMapClientErrors = true;
 //    options.SuppressModelStateInvalidFilter = true;
-//});
-
-builder.Services.AddSingleton<IMyJwtSigningManager, MyJwtSigningManager>();
-
-builder.Services.AddScoped<IGenericRepository<Projeto>, GenericRepository<Projeto>>();
-builder.Services.AddScoped<IGenericRepository<Tarefa>, GenericRepository<Tarefa>>();
-builder.Services.AddScoped<IGenericRepository<Historico>, GenericRepository<Historico>>();
-builder.Services.AddScoped<IGenericRepository<Comentario>, GenericRepository<Comentario>>();
-
-builder.Services.AddAuthentication(x =>
-{
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer();
-
-builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
-    .Configure<IMyJwtSigningManager>((options, signingManager) =>
-    {
-        options.TokenValidationParameters =
-        new TokenValidationParameters
-        {
-            ValidIssuer = "Me",
-            ValidAudience = "Me",
-            ClockSkew = TimeSpan.Zero,
-            IssuerSigningKey = signingManager.FetchCurrentEcdsaKey()
-        };
-    });
-
-//var tokenKey = "MyUltraUnbelievableSecretKey@#$10";
-//var key = Encoding.ASCII.GetBytes(tokenKey);
-//.AddJwtBearer(x =>
-//{
-//    x.RequireHttpsMetadata = false;
-//    x.SaveToken = true;
-//    x.TokenValidationParameters = new TokenValidationParameters
-//    {
-//        ValidateIssuerSigningKey = true,
-//        IssuerSigningKey = new SymmetricSecurityKey(key),
-//        ValidateIssuer = false,
-//        ValidateAudience = false
-//    };
 //});
 
 //builder.Services.AddAuthorization(options =>
@@ -72,7 +27,6 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
 //        policy.RequireRole("Banta");
 //        //policy.RequireRole("Panta");
 //    });
-
 //});
 
 builder.Services.AddControllers();
@@ -104,6 +58,7 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
+    options.EnableAnnotations();
 });
 
 var app = builder.Build();
@@ -115,18 +70,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
-//app.UseRouting();
-//app.UseCors();
-//app.UseAuthentication();
-//app.UseAuthorization();
-
+// Importante! Atentar para a ordem de execução dos Middlewares.
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 await app.RunAsync();
