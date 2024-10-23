@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Services;
 using Infrastructure.Data.Persistence;
 using Infrastructure.Data.Persistence.Repositories;
 using Infrastructure.Security.Identity.Services;
@@ -22,6 +23,8 @@ namespace Infrastructure.IoC.IocExtensions
         {
             services.AddDbContext<MyDbContext>();
             services.AddSingleton<IMyJwtSigningManager, MyJwtSigningManager>();
+            services.AddScoped<IProjetoService, ProjetoService>();
+            
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnityOfWork, UnityOfWork>();
 
@@ -44,10 +47,6 @@ namespace Infrastructure.IoC.IocExtensions
                     };
                 });
 
-            return services;
-        }
-        public static IServiceCollection ConfigureApiServices(this IServiceCollection services)
-        {
             return services;
         }
     }

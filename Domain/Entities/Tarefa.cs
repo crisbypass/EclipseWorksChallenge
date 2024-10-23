@@ -17,12 +17,12 @@ namespace Domain.Entities
         /// <remarks>
         /// Não é permitido alterar a prioridade de uma tarefa depois que ela foi criada.
         /// </remarks>
-        public Prioridade Prioridade { get; set; }
+        public PrioridadeEnum Prioridade { get; set; }
         /// <summary>
         /// Comentarios individuais também podem historico.
         /// </summary>
         public ICollection<Comentario> Comentarios { get; set; } = default!;
-        public Status Status { get; set; }
+        public StatusEnum Status { get; set; }
         public DateTime Vencimento { get; set; }
         public Projeto Projeto { get; set; } = default!;
         public ICollection<Historico> Historicos { get; set; } = default!;

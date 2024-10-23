@@ -27,9 +27,9 @@ namespace Infrastructure.Data.Persistence.Configurations
             //.HasConversion(v => v.ToString(), v => (Status)Enum.Parse(typeof(Status), v));
 
             builder.Property(p => p.Prioridade)
-            .HasConversion(v => Convert.ToInt32(v), v => (Prioridade)v);
+            .HasConversion(v => Convert.ToInt32(v), v => (PrioridadeEnum)v);
             builder.Property(p => p.Status)
-            .HasConversion(v => Convert.ToInt32(v), v => (Status)v);
+            .HasConversion(v => Convert.ToInt32(v), v => (StatusEnum)v);
         }
     }
 }

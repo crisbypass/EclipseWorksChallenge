@@ -1,9 +1,9 @@
 ﻿namespace Domain.Enums
 {
-    public enum Status
+    public enum StatusEnum
     {
         Pendente,
         EmAndamento,
-        Concluida
+        Concluido
     }
 }

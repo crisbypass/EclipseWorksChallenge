@@ -1,5 +1,5 @@
-﻿using Application.Interfaces;
-using EclipseWorksChallenge.Models;
+﻿using Application.Dtos;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -32,23 +32,20 @@ namespace EclipseWorksChallenge.Controllers
         /// <remarks>
         /// Não há necessidade de informar códigos de acesso(ou senhas).
         /// </remarks>
-        
         [HttpPost(nameof(RecuperarToken))]
-        [ProducesResponseType<BadRequest>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
-        [ProducesResponseType<Ok>(StatusCodes.Status200OK, MediaTypeNames.Text.Plain)]
+        [Consumes(typeof(InputUsuarioDto), MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(Ok), StatusCodes.Status200OK, MediaTypeNames.Text.Plain)]
+        [ProducesResponseType(typeof(ValidationProblemDetails),
+            StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
         [SwaggerOperation("Recupera um JWT, para uso em um endpoint protegido.",
             @"Fornece a opção de obter um JWT, para experimentos. Não é necessário
             um código de acesso. Informe apenas um nome de usuário e sua função, para
-            serem usados na identidade e incorporados no conteúdo do token.")]
-        public async Task<IActionResult> RecuperarToken(UsuarioModel usuarioModel)
+            serem usados na identidade e incorporados no conteúdo do token. As funções possíveis
+            (e seus valores correspondentes) são: Estagiario = 0, Contador = 1, Analista = 2, Gerente = 3")]
+        public async Task<IActionResult> RecuperarToken(InputUsuarioDto usuarioModel)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             return await Task.FromResult(Ok(
-                _myJwtSigningManager.FetchToken(usuarioModel.Nome,
+                _myJwtSigningManager.FetchToken(usuarioModel.NomeUsuario,
                 Enum.GetName(usuarioModel.Funcao)!)
                 ));
         }
@@ -59,11 +56,11 @@ namespace EclipseWorksChallenge.Controllers
         /// Nome do usuário e sua função.
         /// </returns>
         [Authorize]
-        [ProducesResponseType<UnauthorizedResult>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType<Ok>(StatusCodes.Status200OK, MediaTypeNames.Text.Plain)]
-        [SwaggerOperation("Verifica os dados do usuário que estão contidos no JWT.",
-            @"Fornece a opção de verificar o nome e a função do usuário contidos no JWT.
-            Forneça um token na aba para segurança(icone do cadeado), a partir de 'RecuperarToken'.")]
+        [SwaggerOperation("Inspeciona os dados do usuário que estão contidos em um JWT válido.",
+            @"Fornece a opção de verificar o nome e a função do usuário contidos em JWT(Ecdsa) válido.
+            Forneça um token na aba para segurança(icone do cadeado do endpoint atual), a partir de 'RecuperarToken'.")]
         [HttpGet(nameof(VerificarInfoUsuario))]
         public async Task<IActionResult> VerificarInfoUsuario()
         {

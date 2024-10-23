@@ -1,6 +1,6 @@
 ﻿namespace Domain.Enums
 {
-    public enum Prioridade
+    public enum PrioridadeEnum
     {
         Baixa,
         Media,

@@ -6,13 +6,14 @@ namespace Application.Interfaces
     public interface IGenericRepository<TEntity> where TEntity : Entity
     {
         Task<TEntity?> BuscarUnicoAsync(int keyId, Func<TEntity, object>[] propriedadesIncluidas = null!);
-        Task<IEnumerable<TEntity>> BuscarVariosAsync(
+        Task<(bool HasPreviousPage, bool HasNextPage, IEnumerable<TEntity> Items)> BuscarVariosAsync(
             Expression<Func<TEntity, bool>> filtro = null!,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> ordenarPor = null!,
-            Func<TEntity, object>[] propriedadesIncluidas = null!,
-            bool paginar = false,
-            int pagina = 1,
-            int tamanhoPagina = 100);
+            bool paginate = true,
+            int page = 1,
+            int pageSize = 100,
+            Func<TEntity, object>[] propriedadesIncluidas = null!
+            );
         Task<TEntity> EditarAsync(TEntity item);
         Task<TEntity> ExcluirAsync(int id);
         Task<TEntity> InserirAsync(TEntity item);

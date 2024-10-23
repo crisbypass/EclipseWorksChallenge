@@ -21,8 +21,8 @@ namespace Application.Dtos
         /// <remarks>
         /// Não é permitido alterar a prioridade de uma tarefa depois que ela foi criada.
         /// </remarks>
-        public Prioridade Prioridade { get; set; }
-        public Status Status { get; set; }
+        public PrioridadeEnum Prioridade { get; set; }
+        public StatusEnum Status { get; set; }
         public DateTime Vencimento { get; set; }
     }
 }

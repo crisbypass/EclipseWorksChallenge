@@ -82,13 +82,13 @@ namespace Infrastructure.Data.Persistence.Repositories
                 return await query.ToListAsync();
             }
         }
-        public async Task<IEnumerable<TEntity>> BuscarVariosAsync(
+        public async Task<(bool HasPreviousPage, bool HasNextPage, IEnumerable<TEntity> Items)> BuscarVariosAsync(
             Expression<Func<TEntity, bool>> filtro = null!,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> ordernarPor = null!,
-            Func<TEntity, object>[] propriedadesIncluidas = null!,
-            bool paginar = false,
-            int pagina = 1,
-            int tamanhoPagina = 100
+            bool paginate = true,
+            int page = 1,
+            int pageSize = 100,
+            Func<TEntity, object>[] propriedadesIncluidas = null!
             )
         {
             IQueryable<TEntity> query = _context.Set<TEntity>();
@@ -107,28 +107,36 @@ namespace Infrastructure.Data.Persistence.Repositories
             {
                 var ordered = ordernarPor(query);
 
-                if (paginar)
+                if (paginate)
                 {
-                    return await ordered
-                        .Skip((pagina - 1) * tamanhoPagina)
-                        .Take(tamanhoPagina)
+                    //public IReadOnlyCollection<T> Items { get; } = items;
+                    //public int PageNumber { get; } = pageNumber;
+                    //public int TotalPages { get; } = (int)Math.Ceiling(count / (double)pageSize);
+                    //public int TotalCount { get; } = count;
+                    //public bool HasPreviousPage => PageNumber > 1;
+                    //public bool HasNextPage => PageNumber < TotalPages;
+                    var count = await ordered.CountAsync();
+                    var totalPages = (int)Math.Ceiling(count / (double)pageSize);
+
+                    bool hasPreviousPage = page > 1;
+                    bool hasNextPage = page < totalPages;
+
+                    var paginatedItems = await ordered
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
                         .ToListAsync();
+
+                    return (hasPreviousPage, hasNextPage, paginatedItems);
                 }
 
-                return await ordered.ToListAsync();
-            }
-            else
-            {
-                if (paginar)
-                {
-                    return await query
-                        .Skip((pagina - 1) * tamanhoPagina)
-                        .Take(tamanhoPagina)
-                        .ToListAsync();
-                }
+                var items = await ordered.ToListAsync();
 
-                return await query.ToListAsync();
+                return (false, false, items);
             }
+            
+            var resultItems = await query.ToListAsync();
+
+            return (false, false, resultItems);
         }
         public async Task<TEntity> InserirAsync(TEntity item)
         {
@@ -189,22 +197,20 @@ namespace Infrastructure.Data.Persistence.Repositories
             return await query.CountAsync();
         }
     }
-    public class PaginatedList<T>(IReadOnlyCollection<T> items, int count, int pageNumber, int pageSize)
-    {
-        public IReadOnlyCollection<T> Items { get; } = items;
-        public int PageNumber { get; } = pageNumber;
-        public int TotalPages { get; } = (int)Math.Ceiling(count / (double)pageSize);
-        public int TotalCount { get; } = count;
-        public bool HasPreviousPage => PageNumber > 1;
-        public bool HasNextPage => PageNumber < TotalPages;
-        public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int pageNumber, int pageSize)
-        {
-            var count = await source.CountAsync();
-            var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+    //public class PaginatedList<T>(IReadOnlyCollection<T> items, int count, int pageNumber, int pageSize)
+    //{
+    //    public IReadOnlyCollection<T> Items { get; } = items;
+    //    public int PageNumber { get; } = pageNumber;
+    //    public int TotalPages { get; } = (int)Math.Ceiling(count / (double)pageSize);
+    //    public int TotalCount { get; } = count;
+    //    public bool HasPreviousPage => PageNumber > 1;
+    //    public bool HasNextPage => PageNumber < TotalPages;
+    //    public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int pageNumber, int pageSize)
+    //    {
+    //        var count = await source.CountAsync();
+    //        var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
-            return new PaginatedList<T>(items, count, pageNumber, pageSize);
-        }
-    }
-
-
+    //        return new PaginatedList<T>(items, count, pageNumber, pageSize);
+    //    }
+    //}
 }
