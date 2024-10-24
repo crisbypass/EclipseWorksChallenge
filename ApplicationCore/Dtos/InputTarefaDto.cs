@@ -8,18 +8,6 @@ namespace Application.Dtos
 {
     public class InputTarefaDto
     {
-        /// <summary>
-        /// Valor recuperado a partir da rota na atualização.
-        /// </summary>
-        /// <remarks>
-        /// Gerado automaticamente pelo banco na criação.
-        /// </remarks>
-        public int Id { get; set; }
-        /// <summary>
-        /// Valor recuperado a partir da rota.
-        /// </summary>
-        public int ProjetoId { get; set; }
-
         [Required(ErrorMessage = Mensagens.Requerido)]
         public string Titulo { get; set; } = default!;
 
@@ -39,7 +27,7 @@ namespace Application.Dtos
         /// </summary>
         /// <remarks>
         /// Não tenho a informação se o Status inicial da tarefa pode ser Concluido.
-        /// Se for esse o caso, comente(desabilite) a DataAnnotation 'VerificarStatusInicial'.
+        /// Conforme o caso, comente ou descomente a DataAnnotation 'VerificarStatusInicial'.
         /// </remarks>
         [VerificarStatusInicial]
         [Required(ErrorMessage = Mensagens.Requerido)]
@@ -50,7 +38,7 @@ namespace Application.Dtos
         /// </summary>
         /// <remarks>
         /// Não tenho a informação se o Vencimento inicial da tarefa pode ser retroativo.
-        /// Se for esse o caso, comente(desabilite) a DataAnnotation 'DataMinHoje'.
+        /// Conforme o caso, comente ou descomente a DataAnnotation 'DataMinHoje'.
         /// </remarks>
         [DataMinHoje]
         [Required(ErrorMessage = Mensagens.Requerido)]

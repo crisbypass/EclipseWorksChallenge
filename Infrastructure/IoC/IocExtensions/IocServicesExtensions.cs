@@ -4,7 +4,11 @@ using Infrastructure.Data.Persistence;
 using Infrastructure.Data.Persistence.Repositories;
 using Infrastructure.Security.Identity.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.IoC.IocExtensions
@@ -19,11 +23,24 @@ namespace Infrastructure.IoC.IocExtensions
     /// </remarks>
     public static class IocServicesExtensions
     {
-        public static IServiceCollection ConfigureCoreServices(this IServiceCollection services)
+        public static IServiceCollection ConfigureCoreServices(this IServiceCollection services, 
+            IConfiguration configuration)
         {
-            services.AddDbContext<MyDbContext>();
+            services.AddDbContext<MyDbContext>(builder => {
+
+                var connectionString = configuration.GetConnectionString("DefaultConnection") ??
+                    throw new InvalidOperationException("Connection string 'DefaultConnection' não encontrada.");
+
+                using var loggerFactory = LoggerFactory.Create(x=> x.AddConsole());
+
+                var logger = loggerFactory.CreateLogger<MyDbContext>();
+
+                builder.UseInMemoryDatabase(connectionString)
+                    .LogTo(message => logger.Log(LogLevel.Information, message));
+            });
             services.AddSingleton<IMyJwtSigningManager, MyJwtSigningManager>();
             services.AddScoped<IProjetoService, ProjetoService>();
+            services.AddScoped<ITarefaService, TarefaService>();
             
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnityOfWork, UnityOfWork>();

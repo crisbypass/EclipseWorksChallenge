@@ -9,65 +9,68 @@ namespace Application.Services
     public class ProjetoService(IUnityOfWork unityOfWork) : IProjetoService
     {
         private readonly IUnityOfWork _unityOfWork = unityOfWork;
-        public async Task<(bool HasPreviousPage, bool HasNextPage, IEnumerable<ProjetoDto> ProjetoDtos)>
+        public async Task<(bool HasPreviousPage, bool HasNextPage, IEnumerable<ProjetoDto> ProjetoDtos, bool IsNotFound)>
             ListarProjetosAsync(InputProjetoDto inputProjetoDto, int pagina = 1)
         {
+            var count = await _unityOfWork.ProjetoRepository.ContarItensAsync(filtro: x => x.NomeUsuario == inputProjetoDto.NomeUsuario);
+
+            if (count == 0)
+            {
+                return (false, false, null!, true);
+            }
+
             var (HasPreviousPage, HasNextPage, Items) = await _unityOfWork.ProjetoRepository
                 .BuscarVariosAsync(x => x.NomeUsuario == inputProjetoDto.NomeUsuario,
                 x => x.OrderBy(x => x.Id),
                 page: pagina);
 
-            return (HasPreviousPage, HasNextPage, Items.Select(x => x.ToProjetoDto()));
+            return (HasPreviousPage, HasNextPage, Items.Select(x => x.ToProjetoDto()), false);
         }
-        public async Task<ProjetoDto> CriarProjetoAsync(InputProjetoDto projetoDto)
+        public async Task<(bool Sucesso, ProjetoDto ProjetoDto, string Mensagem)> CriarProjetoAsync(InputProjetoDto projetoDto)
         {
-            Projeto projeto = new()
-            {
-                NomeUsuario = projetoDto.NomeUsuario
-            };
-
-            //var inserido = await _projetoRepository.InserirAsync(projeto);
+            Projeto projeto = projetoDto.ToProjeto();
 
             var inserido = await _unityOfWork.ProjetoRepository.InserirAsync(projeto);
 
-            var dto = projeto.ToProjetoDto();
+            if (inserido == null)
+            {
+                return (false, null!, Mensagens.FalhaCriacaoProjeto);
+            }
 
             await _unityOfWork.SaveChangesAsync();
 
-            return dto;
+            var dto = inserido.ToProjetoDto();
+
+            return (true, dto, Mensagens.ProjetoCriado);
         }
-        public async Task<(bool Sucesso, ProjetoDto? ProjetoDto, string? Mensagem)> ExcluirProjetoAsync(int projetoId)
+        public async Task<(bool Sucesso, ProjetoDto ProjetoDto, string Mensagem)> ExcluirProjetoAsync(int projetoId)
         {
-            //var project = await _projetoRepository.BuscarUnicoAsync(projetoId,
-            //    propriedadesIncluidas: [x =>
-            //    x.Tarefas
-            //    .Where(x => x.Status != Status.Concluida)
-            //    .AsQueryable()]
-            //    );
+            var project = await _unityOfWork.ProjetoRepository.BuscarUnicoAsync(projetoId);
 
-            var project = await _unityOfWork.ProjetoRepository.BuscarUnicoAsync(projetoId,
-                propriedadesIncluidas: [x =>
-                x.Tarefas
-                .Where(x => x.Status != StatusEnum.Concluido)
-                .AsQueryable()]
-                );
-
-            if (project != null && project.Tarefas.Count > 0)
+            if (project == null)
             {
-                return (false, null, Mensagens.ErroExclusaoProjeto);
-            }
-            else if (project == null)
-            {
-                return (false, null, null);
+                return (false, null!, Mensagens.ProjetoNaoEncontrado);
             }
 
-            var projetoDto = project.ToProjetoDto();
+            var count = await _unityOfWork.TarefaRepository.ContarItensAsync(filtro:
+                x => x.ProjetoId == project!.Id && x.Status != StatusEnum.Concluido);
 
-            return (true, projetoDto, null);
+            if (project != null && count > 0)
+            {
+                return (false, null!, Mensagens.ErroExclusaoProjeto);
+            }
+
+            var excluido = await _unityOfWork.ProjetoRepository.ExcluirAsync(projetoId);
+
+            await _unityOfWork.SaveChangesAsync();
+
+            var projetoDto = excluido.ToProjetoDto();
+
+            return (true, projetoDto, Mensagens.ProjetoRemovido);
         }
     }
     /// <summary>
-    /// Conversão manual simples da entidade Projeto, para ProjetoDto.
+    /// Conversão manual de entidades e dtos.
     /// </summary>
     /// <remarks>
     /// Para efeitos de simplicidade e performance, esta opção foi escolhida em detrimento
@@ -78,7 +81,13 @@ namespace Application.Services
         public static ProjetoDto ToProjetoDto(this Projeto projeto) =>
             new()
             {
+                Id = projeto.Id,
                 NomeUsuario = projeto.NomeUsuario
+            };
+        public static Projeto ToProjeto(this InputProjetoDto projetoDto) =>
+            new()
+            {
+                NomeUsuario = projetoDto.NomeUsuario
             };
     }
 }

@@ -4,7 +4,8 @@ using Infrastructure.IoC.IocExtensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.ConfigureCoreServices();
+
+builder.Services.ConfigureCoreServices(builder.Configuration);
 builder.Services.ConfigureApiServices();
 
 var app = builder.Build();

@@ -12,6 +12,7 @@
         /// </summary>
         public string Responsavel { get; set; } = default!;
         public DateTime DataAtualizacao { get; set; }
+        public bool TarefaConcluida { get; set; }
         public Tarefa Tarefa { get; set; } = default!;
     }
 }

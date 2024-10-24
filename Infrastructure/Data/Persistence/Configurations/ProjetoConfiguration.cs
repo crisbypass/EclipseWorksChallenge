@@ -14,7 +14,6 @@ namespace Infrastructure.Data.Persistence.Configurations
              .WithOne(p => p.Projeto)
              .HasForeignKey(p => p.ProjetoId)
              .OnDelete(DeleteBehavior.NoAction);
-            //builder.ToTable("MyTable"); // Defina o nome da tabela se necessário
         }
     }
 }

@@ -5,10 +5,6 @@ namespace Application.Dtos
 {
     public class InputComentarioDto
     {
-        /// <summary>
-        /// Valor recuperado a partir da rota.
-        /// </summary>
-        public int TarefaId { get; set; }
         [Required(ErrorMessage = Mensagens.Requerido)]
         public string Descricao { get; set; } = default!;
         /// <summary>

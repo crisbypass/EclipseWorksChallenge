@@ -21,11 +21,6 @@ namespace Infrastructure.Data.Persistence.Configurations
              .HasForeignKey(p => p.TarefaId)
              .OnDelete(DeleteBehavior.NoAction);
 
-            //builder.Property(p => p.Prioridade)
-            //.HasConversion(v => v.ToString(), v => (Prioridade)Enum.Parse(typeof(Prioridade), v));
-            //builder.Property(p => p.Status)
-            //.HasConversion(v => v.ToString(), v => (Status)Enum.Parse(typeof(Status), v));
-
             builder.Property(p => p.Prioridade)
             .HasConversion(v => Convert.ToInt32(v), v => (PrioridadeEnum)v);
             builder.Property(p => p.Status)
